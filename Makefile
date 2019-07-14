@@ -11,8 +11,8 @@ help:
 
 .PHONY: build
 build: ## build application binaries
-	GOOS=darwin GOARCH=amd64 go build -o forwardingproxy-darwin-amd64 .
-	GOOS=linux GOARCH=amd64 go build -o forwardingproxy-linux-amd64 .
+	GOOS=darwin GOARCH=amd64 go build -o contactbook-darwin-amd64 .
+	GOOS=linux GOARCH=amd64 go build -o contactbook-linux-amd64 .
 
 .PHONY: dep
 dep: ## install latest build of dependency manager and linters
@@ -23,10 +23,6 @@ dep: ## install latest build of dependency manager and linters
 	go get -u github.com/gorilla/mux
 	go get -u github.com/gemcook/pagination-go
 	go get -u github.com/joho/godotenv
-
-.PHONY: dep-ensure
-dep-ensure: ## ensure dependencies are safely vendored in the project
-	dep ensure
 
 .PHONY: lint
 lint: ## check code for lint errors

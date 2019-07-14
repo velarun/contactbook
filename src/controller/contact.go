@@ -199,12 +199,18 @@ func SearchContact(w http.ResponseWriter, r *http.Request) {
 	}
 
 	log.Println("Pagination of Search Content, Total Pages:", strconv.Itoa(totalPages), ", Total Count of Data:", strconv.Itoa(totalCount), ", Limit per Page:", pageLimit)
-
-	w.Header().Set("X-Total-Count", strconv.Itoa(totalCount))
-	w.Header().Set("X-Total-Pages", strconv.Itoa(totalPages))
-	w.Header().Set("Access-Control-Expose-Headers", "X-Total-Count,X-Total-Pages")
-	w.Header().Set("Content-Type", "application/json; charset=utf-8")
-	w.WriteHeader(200)
-	resp, _ := json.Marshal(res)
-	w.Write(resp)
+	
+	if len(res.Pages["active"]) == 0 {
+		w.Header().Set("Content-Type", "text/html; charset=utf8")
+		w.WriteHeader(404)
+		fmt.Fprintf(w, "Content Not Found")
+	} else {
+		w.Header().Set("X-Total-Count", strconv.Itoa(totalCount))
+		w.Header().Set("X-Total-Pages", strconv.Itoa(totalPages))
+		w.Header().Set("Access-Control-Expose-Headers", "X-Total-Count,X-Total-Pages")
+		w.Header().Set("Content-Type", "application/json; charset=utf-8")
+		w.WriteHeader(200)
+		resp, _ := json.Marshal(res.Pages["active"])
+		w.Write(resp)
+	}
 }

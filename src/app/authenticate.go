@@ -27,6 +27,7 @@ func JwtMiddleWare(next http.Handler) http.Handler {
 
 		response := make(map[string] interface{})
 		headerString := r.Header.Get("Authorization")
+		log.Println(headerString)
 		parts := strings.Split(headerString, " ")
 
 		if strings.TrimSpace(headerString) == "" {
