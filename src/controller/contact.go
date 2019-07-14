@@ -14,6 +14,7 @@ import (
 )
 
 var userid interface{}
+var contacts *[]model.Contact
 
 type SearchCondition struct {
 	Email *string
@@ -31,24 +32,22 @@ type contactFetcher struct {
 
 func (fr *contactsRepository) GetContact(orders []*pagination.Order) []model.Contact {
 	result := make([]model.Contact, 0)
-	user := model.GetUser(userid)
-	contacts := model.GetUserContact(user.Username)
 	if fr.email != "" {
-		log.Println("Search Pattern is Email for user ", user.Username)
+		log.Println("Search Pattern is Email for user ")
 		for _, f := range *contacts {
 			if fr.email == f.ContactEmail {
 				result = append(result, f)
 			}
 		}
 	} else if fr.name != "" {
-		log.Println("Search Pattern is Name for user ", user.Username)
+		log.Println("Search Pattern is Name for user ")
 		for _, f := range *contacts {
 			if fr.name == f.ContactName {
 				result = append(result, f)
 			}
 		}
 	} else {
-		log.Println("Search Pattern is nothing simply page display for user ", user.Username)
+		log.Println("Search Pattern is nothing simply page display for user ")
 		for _, f := range *contacts {
 			result = append(result, f)
 		}
@@ -134,50 +133,53 @@ func newContactsRepository() *contactsRepository {
 	}
 }
 
-func CreateContact(w http.ResponseWriter, r *http.Request) {
+func (a *App) CreateContact(w http.ResponseWriter, r *http.Request) {
 
 	contact := &model.Contact{}
 	json.NewDecoder(r.Body).Decode(contact)
 
-	if resp, ok := contact.Validate(); !ok {
+	if resp, ok := contact.Validate(a.Conn); !ok {
 		log.Println("Create Contact: Validation Failed")
 		Respond(w, resp)
 	} else {
-		resp = contact.Create()
+		resp = contact.Create(a.Conn)
 		Respond(w, resp)
 	}
 }
 
-func DeleteContact(w http.ResponseWriter, r *http.Request) {
+func (a *App) DeleteContact(w http.ResponseWriter, r *http.Request) {
 
 	contact := &model.Contact{}
 	json.NewDecoder(r.Body).Decode(contact)
 
-	if resp, ok := contact.Validate(); !ok {
+	if resp, ok := contact.Validate(a.Conn); !ok {
 		log.Println("Delete Contact: Validation Failed")
 		Respond(w, resp)
 	}else {
-		resp = contact.Delete()
+		resp = contact.Delete(a.Conn)
 		Respond(w, resp)
 	}
 }
 
-func UpdateContact(w http.ResponseWriter, r *http.Request) {
+func (a *App) UpdateContact(w http.ResponseWriter, r *http.Request) {
 
 	contact := &model.Contact{}
 	json.NewDecoder(r.Body).Decode(contact)
 
-	if resp, ok := contact.Validate(); !ok {
+	if resp, ok := contact.Validate(a.Conn); !ok {
 		log.Println("Update Contact: Validation Failed")
 		Respond(w, resp)
 	}else {
-		resp = contact.Update()
+		resp = contact.Update(a.Conn)
 		Respond(w, resp)
 	}
 }
 
-func SearchContact(w http.ResponseWriter, r *http.Request) {
+func (a *App) SearchContact(w http.ResponseWriter, r *http.Request) {
 	userid = r.Context().Value("user")
+	user := model.GetUser(userid, a.Conn)
+	contacts = model.GetUserContact(user.Username, a.Conn)
+
 	p := pagination.ParseQuery(r.URL.RequestURI())
 	cond := parseSearchIndex(r.URL.RequestURI())
 	fetcher := newContactFetcher()

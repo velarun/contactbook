@@ -19,7 +19,7 @@ type User struct {
 	gorm.Model
 	Username string `json:"username"`
 	Email string `json:"email"`
-	Password string
+	Password string `json:"password"`
 }
 
 func (u *User) Create(db *gorm.DB) (map[string] interface{}, bool) {
@@ -27,14 +27,14 @@ func (u *User) Create(db *gorm.DB) (map[string] interface{}, bool) {
 	tempUser := User{}
 	resp := make(map[string] interface{})
 
-	GetConn().Where("username = ?", u.Username).First(&tempUser)
+	db.Where("username = ?", u.Username).First(&tempUser)
 	if tempUser.Username != "" {
 		resp["status"] = false
 		resp["message"] = "Username already exists"
 		return resp, false
 	}
 
-	GetConn().Where("email = ?", u.Email).First(&tempUser)
+	db.Where("email = ?", u.Email).First(&tempUser)
 	if tempUser.Email != "" {
 		resp["status"] = false
 		resp["message"] = "Email address already in use"
@@ -88,12 +88,12 @@ func (u *User) Validate() (map[string]interface{}, bool) {
 	return response, true
 }
 
-func Login(username, password string) (map[string]interface{}) {
+func Login(username, password string, db *gorm.DB) (map[string]interface{}) {
 
 	resp := make(map[string]interface{})
 
 	user := &User{}
-	GetConn().Where("username = ?", username).First(user)
+	db.Where("username = ?", username).First(user)
 	if user.Username == "" {
 		resp["status"] = false
 		resp["message"] = "User does not exist."

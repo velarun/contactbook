@@ -1,24 +1,28 @@
 package model
 
-func GetContact(Id uint) *Contact {
+import (
+	"github.com/jinzhu/gorm"
+)
+
+func GetContact(Id uint, db *gorm.DB) *Contact {
 
 	contact := &Contact{}
-	GetConn().First(contact, Id)
+	db.First(contact, Id)
 	return contact
 }
 
-func GetUserContact(userId interface{}) *[]Contact {
+func GetUserContact(userId interface{}, db *gorm.DB) *[]Contact {
 
 	var contacts []Contact
 
-	GetConn().Table("contacts").Where("user_id = ?", userId).Find(&contacts)
+	db.Table("contacts").Where("user_id = ?", userId).Find(&contacts)
 	return &contacts
 }
 
-func GetUser(userId interface{}) *User {
+func GetUser(userId interface{}, db *gorm.DB) *User {
 
 	var user User
 	
-	GetConn().Table("users").Where("id = ?", userId).Find(&user)
+	db.Table("users").Where("id = ?", userId).Find(&user)
 	return &user
 }

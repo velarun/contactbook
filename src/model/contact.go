@@ -14,7 +14,7 @@ type Contact struct {
 	gorm.Model
 }
 
-func (con *Contact) Validate() (map[string]interface{}, bool) {
+func (con *Contact) Validate(db *gorm.DB) (map[string]interface{}, bool) {
 
 	resp := make(map[string] interface{})
 
@@ -63,7 +63,7 @@ func (con *Contact) Validate() (map[string]interface{}, bool) {
 	}
 
 	user := &User{}
-	GetConn().Table("users").Where("username = ?", con.UserId).First(user)
+	db.Table("users").Where("username = ?", con.UserId).First(user)
 	if user.Username == "" {
 		resp["status"] = false
 		resp["message"] = "User not found."
@@ -75,38 +75,38 @@ func (con *Contact) Validate() (map[string]interface{}, bool) {
 	return resp, true
 }
 
-func (contact *Contact) Create() (map[string]interface{}) {
+func (contact *Contact) Create(db *gorm.DB) (map[string]interface{}) {
 
 	resp := make(map[string]interface{})
 	con := &Contact{}
-	GetConn().Where("contact_email = ? AND user_id = ?", contact.ContactEmail, contact.UserId).First(con)
+	db.Where("contact_email = ? AND user_id = ?", contact.ContactEmail, contact.UserId).First(con)
 	if con.ContactEmail != "" {
 		resp["status"] = false
 		resp["message"] = "This contact already exists in user's contact list"
 		return resp
 	}
 
-	GetConn().Create(contact)
+	db.Create(contact)
 
 	log.Println("Create contact with Email:", contact.ContactEmail," for user ", contact.UserId, "Done.")
 	resp["status"] = true
 	resp["message"] = "Contact has been created."
-	resp["contact"] = GetContact(contact.ID)
+	resp["contact"] = GetContact(contact.ID, db)
 	return resp
 }
 
-func (contact *Contact) Delete() (map[string]interface{}) {
+func (contact *Contact) Delete(db *gorm.DB) (map[string]interface{}) {
 
 	resp := make(map[string]interface{})
 	con := &Contact{}
-	GetConn().Where("contact_email = ? AND user_id = ?", contact.ContactEmail, contact.UserId).First(con)
+	db.Where("contact_email = ? AND user_id = ?", contact.ContactEmail, contact.UserId).First(con)
 	if con.ContactEmail == "" {
 		resp["status"] = false
 		resp["message"] = "This contact not exists in user's contact list"
 		return resp
 	}
 
-	GetConn().Unscoped().Where("contact_email = ? AND user_id = ?", contact.ContactEmail, contact.UserId).Delete(con)
+	db.Unscoped().Where("contact_email = ? AND user_id = ?", contact.ContactEmail, contact.UserId).Delete(con)
 
 	log.Println("Delete contact with Email:", contact.ContactEmail," for user ", contact.UserId, "Done.")
 	resp["status"] = true
@@ -114,18 +114,18 @@ func (contact *Contact) Delete() (map[string]interface{}) {
 	return resp
 }
 
-func (contact *Contact) Update() (map[string]interface{}) {
+func (contact *Contact) Update(db *gorm.DB) (map[string]interface{}) {
 
 	resp := make(map[string]interface{})
 	con := &Contact{}
-	GetConn().Where("contact_email = ? AND user_id = ?", contact.ContactEmail, contact.UserId).First(con)
+	db.Where("contact_email = ? AND user_id = ?", contact.ContactEmail, contact.UserId).First(con)
 	if con.ContactEmail == "" {
 		resp["status"] = false
 		resp["message"] = "This contact not exists in user's contact list"
 		return resp
 	}
 
-	GetConn().Table("contacts").Where("contact_email = ? AND user_id = ?", contact.ContactEmail, contact.UserId).Update(contact)
+	db.Table("contacts").Where("contact_email = ? AND user_id = ?", contact.ContactEmail, contact.UserId).Update(contact)
 
 	log.Println("Update contact with Email:", contact.ContactEmail," for user ", contact.UserId, "Done.")
 	resp["status"] = true
