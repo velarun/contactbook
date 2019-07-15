@@ -30,4 +30,4 @@ lint: ## check code for lint errors
 
 .PHONY: test
 test: ## run unit tests
-	go test -race ./...
+	go test -v

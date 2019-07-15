@@ -19,6 +19,14 @@ func GetUserContact(userId interface{}, db *gorm.DB) *[]Contact {
 	return &contacts
 }
 
+func GetUpdatedContact(userId interface{}, email interface{}, db *gorm.DB) *Contact {
+
+	contact := &Contact{}
+
+	db.Table("contacts").Where("contact_email = ? AND user_id = ?", email, userId).Find(contact)
+	return contact
+}
+
 func GetUser(userId interface{}, db *gorm.DB) *User {
 
 	var user User

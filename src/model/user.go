@@ -61,31 +61,31 @@ func (u *User) Create(db *gorm.DB) (map[string] interface{}, bool) {
 	return resp, true
 }
 
-func (u *User) Validate() (map[string]interface{}, bool) {
+func (u *User) Delete(db *gorm.DB) (map[string] interface{}, bool) {
 
-	response := make(map[string]interface{})
+	tempUser := User{}
+	resp := make(map[string] interface{})
 
-	if strings.TrimSpace(u.Username) == "" {
-		response["status"] = false
-		response["message"] = "Username cannot be empty"
-		return response, false
+	db.Where("username = ?", u.Username).First(&tempUser)
+	if tempUser.Username == "" {
+		resp["status"] = false
+		resp["message"] = "Account not exists"
+		return resp, false
 	}
 
-	if strings.TrimSpace(u.Email) == "" {
-		response["status"] = false
-		response["message"] = "Email cannot be empty"
-		return response, false
+	db.Where("email = ?", u.Email).First(&tempUser)
+	if tempUser.Email == "" {
+		resp["status"] = false
+		resp["message"] = "Account not exist"
+		return resp, false
 	}
 
-	if strings.TrimSpace(u.Password) == "" {
-		response["status"] = false
-		response["message"] = "Password cannot be empty"
-		return response, false
-	}
+	db.Unscoped().Where("username = ? AND email = ?", u.Username, u.Email).Delete(tempUser)
 
-	response["status"] = true
-	response["message"] = "All Required field(s) present."
-	return response, true
+	resp["status"] = true
+	resp["message"] = "Account has been deleted."
+
+	return resp, true
 }
 
 func Login(username, password string, db *gorm.DB) (map[string]interface{}) {
@@ -126,4 +126,31 @@ func Login(username, password string, db *gorm.DB) (map[string]interface{}) {
 
 	resp["token"] = tokenString
 	return resp
+}
+
+func (u *User) Validate() (map[string]interface{}, bool) {
+
+	response := make(map[string]interface{})
+
+	if strings.TrimSpace(u.Username) == "" {
+		response["status"] = false
+		response["message"] = "Username cannot be empty"
+		return response, false
+	}
+
+	if strings.TrimSpace(u.Email) == "" {
+		response["status"] = false
+		response["message"] = "Email cannot be empty"
+		return response, false
+	}
+
+	if strings.TrimSpace(u.Password) == "" {
+		response["status"] = false
+		response["message"] = "Password cannot be empty"
+		return response, false
+	}
+
+	response["status"] = true
+	response["message"] = "All Required field(s) present."
+	return response, true
 }

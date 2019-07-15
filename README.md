@@ -12,121 +12,134 @@ Version >= 8.0.15
 
 Setup:
 
-Description:
+set .env file:
+Database name, machine, username, password and password(token).
 
-file_input.txt --> input file
-parking_lot.go --> main file
-parking_lot_test.go --> test file
+Use make file:
 
-Execution:
+> make dep
+> make build
+> make test
 
+Sample API:
 
-Run Test suite:
+Create User:
 
-./parking_lot_testsuite
+curl -X POST \
+  http://localhost:9000/user \
+  -H 'Content-Type: application/json' \
+  -H 'Postman-Token: c836b18a-1b06-4452-bf30-034194dd8903' \
+  -H 'cache-control: no-cache' \
+  -d '{ 
+	"username": "test",
+	"email": "test@testing.com",
+	"password": "test"
+}
+'
 
+Get token from response body.
+Sample response:
+{
+    "account": {
+        "ID": 2,
+        "CreatedAt": "2019-07-15T07:18:10Z",
+        "UpdatedAt": "2019-07-15T07:18:10Z",
+        "DeletedAt": null,
+        "username": "test",
+        "email": "test@testing.com",
+        "password": ""
+    },
+    "message": "Login success",
+    "status": true,
+    "token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJVc2VyIjoyLCJVc2VybmFtZSI6InRlc3QifQ.KrirPAvJlVOCy8d67_BUntSkg4PI6zefwO2yetcPvlQ"
+}
 
-Sample:
+Login User:
 
-Interactive Mode:
+curl -X POST \
+  http://localhost:9000/login \
+  -H 'Content-Type: application/json' \
+  -H 'Postman-Token: d8de0edd-eb62-444b-bb37-d53d5a2d33f3' \
+  -H 'cache-control: no-cache' \
+  -d '{ 
+	"username": "test",
+	"password": "test"
+}'
 
-VelmuruganDhandapani-MacbookPro:ParkingLot velu$ ./parking_lot
+Delete User:
 
-$ 
+curl -X DELETE \
+  http://localhost:9000/user \
+  -H 'Content-Type: application/json' \
+  -H 'Postman-Token: c836b18a-1b06-4452-bf30-034194dd8903' \
+  -H 'cache-control: no-cache' \
+  -d '{ 
+	"username": "test",
+	"email": "test@testing.com",
+	"password": "test"
+}
+'
+Create Contact:
 
-$ create_parking_lot 6
+curl -X POST \
+  http://localhost:9000/contact \
+  -H "Authorization: Bearer xxxxxxxxxxxxxx"
+  -H 'Content-Type: application/json' \
+  -H 'Postman-Token: 8b4a5e0e-6efe-4e6b-afc6-3cb5c6e791d8' \
+  -H 'cache-control: no-cache' \
+  -d '{
+	"contact_name": "user11",
+	"contact_email": "user11@hotmail.com",
+	"phone_number": "+91 8897683200",
+	"user_id": "test"
+}'
 
-Created parking lot with 6 slots
+Delete Contact:
 
-$ park KA-01-HH-1234 White
-Allocated slot number: 1
-$ park KA-01-HH-9999 White
-Allocated slot number: 2
-$ park KA-01-BB-0001 Black
-Allocated slot number: 3
-$ park KA-01-HH-7777 Red
-Allocated slot number: 4
-$ 
-$ park KA-01-HH-2701 Blue
-Allocated slot number: 5
-$ park KA-01-HH-3141 Black
-Allocated slot number: 6
-$ 
-$ 
-$ 
-$ lea
-Invalid input
-$ leave 4
-Slot number 4 is free
-$ status
-Slot No.	Registration No			Colour
-1		KA-01-HH-1234			White
-2		KA-01-HH-9999			White
-3		KA-01-BB-0001			Black
-5		KA-01-HH-2701			Blue
-6		KA-01-HH-3141			Black
-$ park KA-01-P-333 White
-Allocated slot number: 4
-$ park DL-12-AA-9999 White
-Sorry, parking lot is full
-$ registration_numbers_for_cars_with_colour White
-KA-01-HH-1234, KA-01-HH-9999, KA-01-P-333
-$ slot_numbers_for_cars_with_colour White
-1, 2, 4
-$ slot_number_for_registration_number KA-01-HH-3141
-6
-$ slot_number_for_registration_number MH-04-AY-1111
-Not Found
-$ exit
-VelmuruganDhandapani-MacbookPro:ParkingLot velu$ 
+curl -X DELETE \
+  http://localhost:9000/contact \
+  -H "Authorization: Bearer xxxxxxxxxxxxxx"
+  -H 'Content-Type: application/json' \
+  -H 'Postman-Token: 8b4a5e0e-6efe-4e6b-afc6-3cb5c6e791d8' \
+  -H 'cache-control: no-cache' \
+  -d '{
+	"contact_name": "user11",
+	"contact_email": "user11@hotmail.com",
+	"phone_number": "+91 8897683200",
+	"user_id": "test"
+}'
 
-File mode:
+Update Contact:
 
-VelmuruganDhandapani-MacbookPro:ParkingLot velu$ ./parking_lot file_input.txt 
+curl -X PUT \
+  http://localhost:9000/contact \
+  -H "Authorization: Bearer xxxxxxxxxxxxxx"
+  -H 'Content-Type: application/json' \
+  -H 'Postman-Token: 8b4a5e0e-6efe-4e6b-afc6-3cb5c6e791d8' \
+  -H 'cache-control: no-cache' \
+  -d '{
+	"contact_name": "user11",
+	"contact_email": "user11@hotmail.com",
+	"phone_number": "+91 8897683200",
+	"user_id": "test"
+}'
 
-Created parking lot with 6 slots
-Allocated slot number: 1
-Allocated slot number: 2
-Allocated slot number: 3
-Allocated slot number: 4
-Allocated slot number: 5
-Allocated slot number: 6
-Slot number 4 is free
-Slot No.	Registration No			Colour
-1		KA-01-HH-1234			White
-2		KA-01-HH-9999			White
-3		KA-01-BB-0001			Black
-5		KA-01-HH-2701			Blue
-6		KA-01-HH-3141			Black
-Allocated slot number: 4
-Sorry, parking lot is full
-KA-01-HH-1234, KA-01-HH-9999, KA-01-P-333
-1, 2, 4
-6
-Not Found
+Search Contact:
 
-Test Environment:
+curl -X GET \
+  'http://localhost:9000/contact?contact_email=user1@yahoo.com' \
+  -H "Authorization: Bearer xxxxxxxxxxxxxx"
+  -H 'Postman-Token: 03c4e888-dcb0-4f17-9bcf-8bcc1cb05366' \
+  -H 'cache-control: no-cache'
 
-$ ./parking_lot_testsuite
-=== RUN   TestCreatingParkingLot
---- PASS: TestCreatingParkingLot (0.00s)
-=== RUN   TestParkingCarInParkingLot
---- PASS: TestParkingCarInParkingLot (0.00s)
-=== RUN   TestLeaveCarFromParkingLot
---- PASS: TestLeaveCarFromParkingLot (0.00s)
-=== RUN   TestGetRegNoByCarColor
---- PASS: TestGetRegNoByCarColor (0.00s)
-=== RUN   TestGetSlotNoByCarColor
---- PASS: TestGetSlotNoByCarColor (0.00s)
-=== RUN   TestGetSlotNoByCarRegNo
---- PASS: TestGetSlotNoByCarRegNo (0.00s)
-=== RUN   TestParkingLotStatus
---- PASS: TestParkingLotStatus (0.00s)
-=== RUN   TestRunCommandTask
---- PASS: TestRunCommandTask (0.00s)
-PASS
-ok  	command-line-arguments	(cached)
-PASS
-coverage: 79.5% of statements
-ok  	_/Users/velu/workspace/Parking_Lot	0.010s
+curl -X GET \
+  'http://localhost:9000/contact?contact_name=user1' \
+  -H "Authorization: Bearer xxxxxxxxxxxxxx"
+  -H 'Postman-Token: 03c4e888-dcb0-4f17-9bcf-8bcc1cb05366' \
+  -H 'cache-control: no-cache'
 
+curl -X GET \
+  'http://localhost:9000/contact?page=1' \
+  -H "Authorization: Bearer xxxxxxxxxxxxxx"
+  -H 'Postman-Token: 03c4e888-dcb0-4f17-9bcf-8bcc1cb05366' \
+  -H 'cache-control: no-cache'

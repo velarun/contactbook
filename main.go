@@ -4,7 +4,7 @@ import (
 	"controller"
 )
 
-func main()  {
+func main() {
 	a := controller.App{}
 	a.Initialize()
 	a.Run(":9000")

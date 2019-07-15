@@ -33,7 +33,29 @@ func (a *App) CreateUser(w http.ResponseWriter, r *http.Request) {
 
 	if resp, ok := user.Create(a.Conn); !ok {
 		Respond(w, resp)
-	}else {
+	} else {
+		Respond(w, resp)
+	}
+}
+
+func (a *App) DeleteUser(w http.ResponseWriter, r *http.Request) {
+
+	user := &model.User{}
+
+	err := json.NewDecoder(r.Body).Decode(&user)
+	if err != nil {
+		log.Println("Error Deleting User:", err)
+	}
+
+	if resp, ok := user.Validate(); !ok {
+		w.Header().Add("Content-Type", "application/json")
+		json.NewEncoder(w).Encode(resp)
+		return
+	}
+
+	if resp, ok := user.Delete(a.Conn); !ok {
+		Respond(w, resp)
+	} else {
 		Respond(w, resp)
 	}
 }

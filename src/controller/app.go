@@ -52,6 +52,7 @@ func (a *App) Run(addr string) {
 
 func (a *App) initializeRoutes() {
 	a.Router.HandleFunc("/user", a.CreateUser).Methods("POST")
+	a.Router.HandleFunc("/user", a.DeleteUser).Methods("DELETE")
 	a.Router.HandleFunc("/login", a.Login).Methods("POST")
 
 	a.Router.HandleFunc("/contact", a.CreateContact).Methods("POST")

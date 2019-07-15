@@ -130,5 +130,6 @@ func (contact *Contact) Update(db *gorm.DB) (map[string]interface{}) {
 	log.Println("Update contact with Email:", contact.ContactEmail," for user ", contact.UserId, "Done.")
 	resp["status"] = true
 	resp["message"] = "Contact has been Updated."
+	resp["contact"] = GetUpdatedContact(contact.UserId, contact.ContactEmail, db)
 	return resp
 }
