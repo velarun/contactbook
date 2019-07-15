@@ -23,6 +23,7 @@ dep: ## install latest build of dependency manager and linters
 	go get -u github.com/gorilla/mux
 	go get -u github.com/gemcook/pagination-go
 	go get -u github.com/joho/godotenv
+	go get -u github.com/stretchr/testify/assert
 
 .PHONY: lint
 lint: ## check code for lint errors
