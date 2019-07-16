@@ -78,7 +78,14 @@ func (a *App) Login(w http.ResponseWriter, r *http.Request) {
 	Respond(w, resp)
 }
 
-func TokenAuth(next http.Handler) http.Handler {
+func validate(username, password string) bool {
+    if username == "test" && password == "test" {
+        return true
+    }
+    return false
+}
+
+func BasicAuth(next http.Handler) http.Handler {
 
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 
@@ -92,9 +99,45 @@ func TokenAuth(next http.Handler) http.Handler {
 			}
 		}
 
+		auth := strings.SplitN(r.Header.Get("Authorization"), " ", 2)
+
+        if len(auth) != 2 || auth[0] != "Basic" {
+            http.Error(w, "authorization failed", http.StatusUnauthorized)
+            return
+        }
+
+        payload, _ := base64.StdEncoding.DecodeString(auth[1])
+        pair := strings.SplitN(string(payload), ":", 2)
+
+        if len(pair) != 2 || !validate(pair[0], pair[1]) {
+            http.Error(w, "authorization failed", http.StatusUnauthorized)
+            return
+        }
+
+		log.Println("Basic Authorization succeed for user.")
+		log.Println("User ID: ", tk.User, "Username: ", tk.Username)
+		ctx := context.WithValue(r.Context(), "user", tk.User)
+		r = r.WithContext(ctx)
+		next.ServeHTTP(w, r)
+	})
+}
+
+func TokenAuth(next http.Handler) http.Handler {
+
+	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+
+		passThrough := []string{"/login", "/user"}
+
+		requestPath := r.URL.Path;
+		for _, value := range passThrough {
+			if value == requestPath {
+				next.ServeHTTP(w, r)
+				return
+			}
+		}
+		
 		response := make(map[string] interface{})
 		headerString := r.Header.Get("Authorization")
-		log.Println(headerString)
 		parts := strings.Split(headerString, " ")
 
 		if strings.TrimSpace(headerString) == "" {
