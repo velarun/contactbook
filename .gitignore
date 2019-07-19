@@ -1,2 +1,6 @@
-/*.exe
+*.exe
+*/contactbook/pkg/*
+*/contactbook/src/github.com/*
+*/contactbook/src/golang.org/*
+*/contactbook/src/gopkg.in/*
 

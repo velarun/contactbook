@@ -36,8 +36,6 @@ curl -X POST \
 	"password": "test"
 }
 '
-
-Get token from response body.
 Sample response:
 {
     "account": {
@@ -79,11 +77,13 @@ curl -X DELETE \
 	"password": "test"
 }
 '
+
+Get base64 conversion of username and password for Basic Authentication.
 Create Contact:
 
 curl -X POST \
   http://localhost:9000/contact \
-  -H "Authorization: Bearer xxxxxxxxxxxxxx"
+  -H "Authorization: Basic xxxxxxxxxxxxxx"
   -H 'Content-Type: application/json' \
   -H 'Postman-Token: 8b4a5e0e-6efe-4e6b-afc6-3cb5c6e791d8' \
   -H 'cache-control: no-cache' \
@@ -98,7 +98,7 @@ Delete Contact:
 
 curl -X DELETE \
   http://localhost:9000/contact \
-  -H "Authorization: Bearer xxxxxxxxxxxxxx"
+  -H "Authorization: Basic xxxxxxxxxxxxxx"
   -H 'Content-Type: application/json' \
   -H 'Postman-Token: 8b4a5e0e-6efe-4e6b-afc6-3cb5c6e791d8' \
   -H 'cache-control: no-cache' \
@@ -113,7 +113,7 @@ Update Contact:
 
 curl -X PUT \
   http://localhost:9000/contact \
-  -H "Authorization: Bearer xxxxxxxxxxxxxx"
+  -H "Authorization: Basic xxxxxxxxxxxxxx"
   -H 'Content-Type: application/json' \
   -H 'Postman-Token: 8b4a5e0e-6efe-4e6b-afc6-3cb5c6e791d8' \
   -H 'cache-control: no-cache' \
@@ -128,18 +128,18 @@ Search Contact:
 
 curl -X GET \
   'http://localhost:9000/contact?contact_email=user1@yahoo.com' \
-  -H "Authorization: Bearer xxxxxxxxxxxxxx"
+  -H "Authorization: Basic xxxxxxxxxxxxxx"
   -H 'Postman-Token: 03c4e888-dcb0-4f17-9bcf-8bcc1cb05366' \
   -H 'cache-control: no-cache'
 
 curl -X GET \
   'http://localhost:9000/contact?contact_name=user1' \
-  -H "Authorization: Bearer xxxxxxxxxxxxxx"
+  -H "Authorization: Basic xxxxxxxxxxxxxx"
   -H 'Postman-Token: 03c4e888-dcb0-4f17-9bcf-8bcc1cb05366' \
   -H 'cache-control: no-cache'
 
 curl -X GET \
   'http://localhost:9000/contact?page=1' \
-  -H "Authorization: Bearer xxxxxxxxxxxxxx"
+  -H "Authorization: Basic xxxxxxxxxxxxxx"
   -H 'Postman-Token: 03c4e888-dcb0-4f17-9bcf-8bcc1cb05366' \
   -H 'cache-control: no-cache'
