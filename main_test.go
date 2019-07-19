@@ -9,6 +9,7 @@ import (
 	"net/http/httptest"
 	"controller"
 	"encoding/json"
+	"encoding/base64"
 	"time"
 	"log"
 	
@@ -277,9 +278,7 @@ func CreateUser(t *testing.T) string {
 	response := executeRequest(req)
 
 	checkResponseCode(t, http.StatusOK, response.Code)
-	json.Unmarshal(response.Body.Bytes(), &m)
-	data := m["token"]
-	token := fmt.Sprintf("Bearer %s", data.(string))
+	token := fmt.Sprintf("Basic %s", basicAuth("tester","tester"))
 
 	return token
 }
@@ -289,6 +288,11 @@ func DeleteUser() {
     req, _ := http.NewRequest("DELETE", "/user", bytes.NewBuffer(payload))
 	executeRequest(req)
 }
+
+func basicAuth(username, password string) string {
+	auth := username + ":" + password
+	return base64.StdEncoding.EncodeToString([]byte(auth))
+}  
 
 func CreateContact(token string) {
 	payload := []byte(`{"contact_name": "user1", "contact_email": "user1@testing.com", "phone_number": "+91 8898883210", "user_id": "tester"}`)

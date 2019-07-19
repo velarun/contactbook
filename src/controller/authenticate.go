@@ -4,9 +4,11 @@ import (
 	"net/http"
 	"model"
 	"encoding/json"
+	"encoding/base64"
 	"log"
 	"strings"
 	"github.com/dgrijalva/jwt-go"
+	"golang.org/x/crypto/bcrypt"
 	"os"
 	"context"
 )
@@ -78,14 +80,23 @@ func (a *App) Login(w http.ResponseWriter, r *http.Request) {
 	Respond(w, resp)
 }
 
-func validate(username, password string) bool {
-    if username == "test" && password == "test" {
-        return true
-    }
-    return false
+func (a *App) validate(username, password string, user *model.User) bool {
+	a.Conn.Where("username = ?", username).First(user)
+	if user.Username == "" {
+		return false
+	}
+
+	err := bcrypt.CompareHashAndPassword([]byte(user.Password), []byte(password))
+	if err != nil {
+		if err == bcrypt.ErrMismatchedHashAndPassword {
+			return false
+		}
+	}
+
+    return true
 }
 
-func BasicAuth(next http.Handler) http.Handler {
+func (a *App) BasicAuth(next http.Handler) http.Handler {
 
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 
@@ -107,17 +118,19 @@ func BasicAuth(next http.Handler) http.Handler {
         }
 
         payload, _ := base64.StdEncoding.DecodeString(auth[1])
-        pair := strings.SplitN(string(payload), ":", 2)
+		pair := strings.SplitN(string(payload), ":", 2)
+		user := model.GetUserByUsername(pair[0], a.Conn)
 
-        if len(pair) != 2 || !validate(pair[0], pair[1]) {
+        if len(pair) != 2 || !a.validate(pair[0], pair[1], user) {
             http.Error(w, "authorization failed", http.StatusUnauthorized)
             return
-        }
+		}
 
 		log.Println("Basic Authorization succeed for user.")
-		log.Println("User ID: ", tk.User, "Username: ", tk.Username)
-		ctx := context.WithValue(r.Context(), "user", tk.User)
+		log.Println("User ID: ", user.ID, "Username: ", user.Username)
+		ctx := context.WithValue(r.Context(), "user", user.ID)
 		r = r.WithContext(ctx)
+    
 		next.ServeHTTP(w, r)
 	})
 }

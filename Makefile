@@ -1,5 +1,3 @@
-# Copyright (C) 2018 Betalo AB - All Rights Reserved
-
 PROJECT_NAME := Contact Book App
 
 .PHONY: help

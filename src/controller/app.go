@@ -60,6 +60,6 @@ func (a *App) initializeRoutes() {
 	a.Router.HandleFunc("/contact", a.UpdateContact).Methods("PUT")
 	a.Router.HandleFunc("/contact", a.SearchContact).Methods("GET")
 
-	a.Router.Use(TokenAuth)
+	a.Router.Use(a.BasicAuth)
 }
 
