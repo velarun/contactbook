@@ -10,7 +10,7 @@ type Contact struct {
 	ContactName string `json:"contact_name"`
 	ContactEmail string `json:"contact_email"`
 	PhoneNumber string `json:"phone_number"`
-	UserId string `json:"user_id"`
+	UserId string `json:"user_id, omitempty"`
 	gorm.Model
 }
 

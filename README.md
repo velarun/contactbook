@@ -90,8 +90,7 @@ curl -X POST \
   -d '{
 	"contact_name": "user11",
 	"contact_email": "user11@hotmail.com",
-	"phone_number": "+91 8897683200",
-	"user_id": "test"
+	"phone_number": "+91 8897683200"
 }'
 
 Delete Contact:
@@ -105,8 +104,7 @@ curl -X DELETE \
   -d '{
 	"contact_name": "user11",
 	"contact_email": "user11@hotmail.com",
-	"phone_number": "+91 8897683200",
-	"user_id": "test"
+	"phone_number": "+91 8897683200"
 }'
 
 Update Contact:
@@ -120,8 +118,7 @@ curl -X PUT \
   -d '{
 	"contact_name": "user11",
 	"contact_email": "user11@hotmail.com",
-	"phone_number": "+91 8897683200",
-	"user_id": "test"
+	"phone_number": "+91 8897683200"
 }'
 
 Search Contact:

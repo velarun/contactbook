@@ -24,6 +24,7 @@ func TestMain(m *testing.M) {
 	a.Initialize()
 
 	ensureTableExists()
+	clearTable()
 
 	code := m.Run()
 
@@ -295,14 +296,14 @@ func basicAuth(username, password string) string {
 }  
 
 func CreateContact(token string) {
-	payload := []byte(`{"contact_name": "user1", "contact_email": "user1@testing.com", "phone_number": "+91 8898883210", "user_id": "tester"}`)
+	payload := []byte(`{"contact_name": "user1", "contact_email": "user1@testing.com", "phone_number": "+91 8898883210"}`)
 	req, _ := http.NewRequest("POST", "/contact", bytes.NewBuffer(payload))
 	req.Header.Set("Authorization", token)
 	executeRequest(req)
 }
 
 func DeleteContact(token string) {
-	payload := []byte(`{"contact_name": "user1", "contact_email": "user1@testing.com", "phone_number": "+91 8898883210", "user_id": "tester"}`)
+	payload := []byte(`{"contact_name": "user1", "contact_email": "user1@testing.com", "phone_number": "+91 8898883210"}`)
 	req, _ := http.NewRequest("DELETE", "/contact", bytes.NewBuffer(payload))
 	req.Header.Set("Authorization", token)
 	executeRequest(req)
@@ -312,7 +313,7 @@ func TestCreateContact(t *testing.T) {
 
 	token := CreateUser(t)
 
-	payload := []byte(`{"contact_name": "user1", "contact_email": "user1@testing.com", "phone_number": "+91 8898883210", "user_id": "tester"}`)
+	payload := []byte(`{"contact_name": "user1", "contact_email": "user1@testing.com", "phone_number": "+91 8898883210"}`)
 	ContCreate := "Contact has been created."
 
 	req, _ := http.NewRequest("POST", "/contact", bytes.NewBuffer(payload))
@@ -336,7 +337,7 @@ func TestCreateContactExistCheck(t *testing.T) {
 
 	time.Sleep(5)
 
-	payload := []byte(`{"contact_name": "user2", "contact_email": "user1@testing.com", "phone_number": "+91 8978473874", "user_id": "tester"}`)
+	payload := []byte(`{"contact_name": "user2", "contact_email": "user1@testing.com", "phone_number": "+91 8978473874"}`)
 	ContExist := "This contact already exists in user's contact list"
 
 	req, _ := http.NewRequest("POST", "/contact", bytes.NewBuffer(payload))
@@ -357,12 +358,10 @@ func TestCreateContactIncorrectFieldCheck(t *testing.T) {
 
 	token := CreateUser(t)
 
-	payload5 := []byte(`{"contact_name": "user1user1user1user1user1user1user1user1user1user1user1user1user1user1", "contact_email": "user1@testing.com", "phone_number": "+91 8978473874", "user_id": "tester"}`)
-	payload6 := []byte(`{"contact_name": "user1", "contact_email": "user1testing.com", "phone_number": "+91 8978473874", "user_id": "tester"}`)
-	payload7 := []byte(`{"contact_name": "user1", "contact_email": "user1@testing.com", "phone_number": "+91 *&      8978473874", "user_id": "tester"}`)
-	payload8 := []byte(`{"contact_name": "user1", "contact_email": "user1@testing.com", "phone_number": "+91 8978473874", "user_id": "newtester"}`)
+	payload5 := []byte(`{"contact_name": "user1user1user1user1user1user1user1user1user1user1user1user1user1user1", "contact_email": "user1@testing.com", "phone_number": "+91 8978473874"}`)
+	payload6 := []byte(`{"contact_name": "user1", "contact_email": "user1testing.com", "phone_number": "+91 8978473874"}`)
+	payload7 := []byte(`{"contact_name": "user1", "contact_email": "user1@testing.com", "phone_number": "+91 *&      8978473874"}`)
 	
-	NotExistUser := "User not found."
 	IncorrectPhone := "Phone number has incorrect pattern."
 	IncorrectEmail := "Contact email has incorrect pattern."
 	IncorrectName := "Length of Contact name should be less 50 characters."
@@ -374,7 +373,6 @@ func TestCreateContactIncorrectFieldCheck(t *testing.T) {
 		"IncorrectName": { payload: payload5, expected: IncorrectName },
 		"IncorrectEmail": { payload: payload6, expected: IncorrectEmail },
 		"IncorrectPhone": { payload: payload7, expected: IncorrectPhone },
-		"NotExistUser": { payload: payload8, expected: NotExistUser },
     }
 
 	for name, test := range tests {
@@ -404,15 +402,13 @@ func TestCreateContactEmptyFieldCheck(t *testing.T) {
 
 	token := CreateUser(t)
 
-	payload1 := []byte(`{"contact_name": "", "contact_email": "user1@testing.com", "phone_number": "+91 8978473874", "user_id": "tester"}`)
-	payload2 := []byte(`{"contact_name": "user1", "contact_email": "", "phone_number": "+91 8978473874", "user_id": "tester"}`)
-	payload3 := []byte(`{"contact_name": "user1", "contact_email": "user1@testing.com", "phone_number": "", "user_id": "tester"}`)
-	payload4 := []byte(`{"contact_name": "user1", "contact_email": "user1@testing.com", "phone_number": "+91 8978473874", "user_id": ""}`)
+	payload1 := []byte(`{"contact_name": "", "contact_email": "user1@testing.com", "phone_number": "+91 8978473874"}`)
+	payload2 := []byte(`{"contact_name": "user1", "contact_email": "", "phone_number": "+91 8978473874"}`)
+	payload3 := []byte(`{"contact_name": "user1", "contact_email": "user1@testing.com", "phone_number": ""}`)
 	
 	EmptyName := "Contact name is required."
 	EmptyEmail := "Contact email is required."
 	EmptyPhone := "Phone number is required."
-	EmptyUser := "Username is required."
 
 	tests := map[string]struct{
         payload  []byte
@@ -421,7 +417,6 @@ func TestCreateContactEmptyFieldCheck(t *testing.T) {
 		"EmptyContactName": { payload: payload1, expected: EmptyName },
 		"EmptyContactEmail": { payload: payload2, expected: EmptyEmail },
 		"EmptyContactPhone": { payload: payload3, expected: EmptyPhone },
-		"EmptyContactUser": { payload: payload4, expected: EmptyUser },
     }
 
 	for name, test := range tests {
@@ -451,7 +446,7 @@ func TestDeleteContact(t *testing.T) {
 	token := CreateUser(t)
 	CreateContact(token)
 
-	payload := []byte(`{"contact_name": "user1", "contact_email": "user1@testing.com", "phone_number": "+91 8898883210", "user_id": "tester"}`)
+	payload := []byte(`{"contact_name": "user1", "contact_email": "user1@testing.com", "phone_number": "+91 8898883210"}`)
 	ContDelete := "Contact has been deleted."
 
 	req, _ := http.NewRequest("DELETE", "/contact", bytes.NewBuffer(payload))
@@ -472,7 +467,7 @@ func TestDeleteContactNotExistCheck(t *testing.T) {
 
 	token := CreateUser(t)
 	
-	payload := []byte(`{"contact_name": "user2", "contact_email": "user1@testing.com", "phone_number": "+91 8978473874", "user_id": "tester"}`)
+	payload := []byte(`{"contact_name": "user2", "contact_email": "user1@testing.com", "phone_number": "+91 8978473874"}`)
 	ContNotExist := "This contact not exists in user's contact list"
 
 	req, _ := http.NewRequest("DELETE", "/contact", bytes.NewBuffer(payload))
@@ -490,12 +485,10 @@ func TestDeleteContactIncorrectFieldCheck(t *testing.T) {
 
 	token := CreateUser(t)
 
-	payload5 := []byte(`{"contact_name": "user1user1user1user1user1user1user1user1user1user1user1user1user1user1", "contact_email": "user1@testing.com", "phone_number": "+91 8978473874", "user_id": "tester"}`)
-	payload6 := []byte(`{"contact_name": "user1", "contact_email": "user1testing.com", "phone_number": "+91 8978473874", "user_id": "tester"}`)
-	payload7 := []byte(`{"contact_name": "user1", "contact_email": "user1@testing.com", "phone_number": "+91 *&      8978473874", "user_id": "tester"}`)
-	payload8 := []byte(`{"contact_name": "user1", "contact_email": "user1@testing.com", "phone_number": "+91 8978473874", "user_id": "newtester"}`)
-	
-	NotExistUser := "User not found."
+	payload5 := []byte(`{"contact_name": "user1user1user1user1user1user1user1user1user1user1user1user1user1user1", "contact_email": "user1@testing.com", "phone_number": "+91 8978473874"}`)
+	payload6 := []byte(`{"contact_name": "user1", "contact_email": "user1testing.com", "phone_number": "+91 8978473874"}`)
+	payload7 := []byte(`{"contact_name": "user1", "contact_email": "user1@testing.com", "phone_number": "+91 *&      8978473874"}`)
+
 	IncorrectPhone := "Phone number has incorrect pattern."
 	IncorrectEmail := "Contact email has incorrect pattern."
 	IncorrectName := "Length of Contact name should be less 50 characters."
@@ -507,7 +500,6 @@ func TestDeleteContactIncorrectFieldCheck(t *testing.T) {
 		"IncorrectName": { payload: payload5, expected: IncorrectName },
 		"IncorrectEmail": { payload: payload6, expected: IncorrectEmail },
 		"IncorrectPhone": { payload: payload7, expected: IncorrectPhone },
-		"NotExistUser": { payload: payload8, expected: NotExistUser },
     }
 
 	for name, test := range tests {
@@ -530,15 +522,13 @@ func TestDeleteContactEmptyFieldCheck(t *testing.T) {
 
 	token := CreateUser(t)
 
-	payload1 := []byte(`{"contact_name": "", "contact_email": "user1@testing.com", "phone_number": "+91 8978473874", "user_id": "tester"}`)
-	payload2 := []byte(`{"contact_name": "user1", "contact_email": "", "phone_number": "+91 8978473874", "user_id": "tester"}`)
-	payload3 := []byte(`{"contact_name": "user1", "contact_email": "user1@testing.com", "phone_number": "", "user_id": "tester"}`)
-	payload4 := []byte(`{"contact_name": "user1", "contact_email": "user1@testing.com", "phone_number": "+91 8978473874", "user_id": ""}`)
+	payload1 := []byte(`{"contact_name": "", "contact_email": "user1@testing.com", "phone_number": "+91 8978473874"}`)
+	payload2 := []byte(`{"contact_name": "user1", "contact_email": "", "phone_number": "+91 8978473874"}`)
+	payload3 := []byte(`{"contact_name": "user1", "contact_email": "user1@testing.com", "phone_number": ""}`)
 	
 	EmptyName := "Contact name is required."
 	EmptyEmail := "Contact email is required."
 	EmptyPhone := "Phone number is required."
-	EmptyUser := "Username is required."
 
 	tests := map[string]struct{
         payload  []byte
@@ -547,7 +537,6 @@ func TestDeleteContactEmptyFieldCheck(t *testing.T) {
 		"EmptyContactName": { payload: payload1, expected: EmptyName },
 		"EmptyContactEmail": { payload: payload2, expected: EmptyEmail },
 		"EmptyContactPhone": { payload: payload3, expected: EmptyPhone },
-		"EmptyContactUser": { payload: payload4, expected: EmptyUser },
     }
 
 	for name, test := range tests {
@@ -699,7 +688,7 @@ func TestUpdateContact(t *testing.T) {
 	token := CreateUser(t)
 	CreateContact(token)
 
-	payload := []byte(`{"contact_name": "userupdated", "contact_email": "user1@testing.com", "phone_number": "+91 8898883210", "user_id": "tester"}`)
+	payload := []byte(`{"contact_name": "userupdated", "contact_email": "user1@testing.com", "phone_number": "+91 8898883210"}`)
 	ContCreate := "Contact has been Updated."
 
 	req, _ := http.NewRequest("PUT", "/contact", bytes.NewBuffer(payload))
@@ -729,7 +718,7 @@ func TestUpdateContactNotExistCheck(t *testing.T) {
 	
 	time.Sleep(5)
 
-	payload := []byte(`{"contact_name": "user2", "contact_email": "user2@testing.com", "phone_number": "+91 8978473874", "user_id": "tester"}`)
+	payload := []byte(`{"contact_name": "user2", "contact_email": "user2@testing.com", "phone_number": "+91 8978473874"}`)
 	ContNotExist := "This contact not exists in user's contact list"
 
 	req, _ := http.NewRequest("PUT", "/contact", bytes.NewBuffer(payload))
@@ -750,12 +739,10 @@ func TestUpdateContactIncorrectFieldCheck(t *testing.T) {
 
 	token := CreateUser(t)
 
-	payload5 := []byte(`{"contact_name": "user1user1user1user1user1user1user1user1user1user1user1user1user1user1", "contact_email": "user1@testing.com", "phone_number": "+91 8978473874", "user_id": "tester"}`)
-	payload6 := []byte(`{"contact_name": "user1", "contact_email": "user1testing.com", "phone_number": "+91 8978473874", "user_id": "tester"}`)
-	payload7 := []byte(`{"contact_name": "user1", "contact_email": "user1@testing.com", "phone_number": "+91 *&      8978473874", "user_id": "tester"}`)
-	payload8 := []byte(`{"contact_name": "user1", "contact_email": "user1@testing.com", "phone_number": "+91 8978473874", "user_id": "newtester"}`)
+	payload5 := []byte(`{"contact_name": "user1user1user1user1user1user1user1user1user1user1user1user1user1user1", "contact_email": "user1@testing.com", "phone_number": "+91 8978473874"}`)
+	payload6 := []byte(`{"contact_name": "user1", "contact_email": "user1testing.com", "phone_number": "+91 8978473874"}`)
+	payload7 := []byte(`{"contact_name": "user1", "contact_email": "user1@testing.com", "phone_number": "+91 *&      8978473874"}`)
 	
-	NotExistUser := "User not found."
 	IncorrectPhone := "Phone number has incorrect pattern."
 	IncorrectEmail := "Contact email has incorrect pattern."
 	IncorrectName := "Length of Contact name should be less 50 characters."
@@ -767,7 +754,6 @@ func TestUpdateContactIncorrectFieldCheck(t *testing.T) {
 		"IncorrectName": { payload: payload5, expected: IncorrectName },
 		"IncorrectEmail": { payload: payload6, expected: IncorrectEmail },
 		"IncorrectPhone": { payload: payload7, expected: IncorrectPhone },
-		"NotExistUser": { payload: payload8, expected: NotExistUser },
     }
 
 	for name, test := range tests {
@@ -797,15 +783,13 @@ func TestUpdateContactEmptyFieldCheck(t *testing.T) {
 
 	token := CreateUser(t)
 
-	payload1 := []byte(`{"contact_name": "", "contact_email": "user1@testing.com", "phone_number": "+91 8978473874", "user_id": "tester"}`)
-	payload2 := []byte(`{"contact_name": "user1", "contact_email": "", "phone_number": "+91 8978473874", "user_id": "tester"}`)
-	payload3 := []byte(`{"contact_name": "user1", "contact_email": "user1@testing.com", "phone_number": "", "user_id": "tester"}`)
-	payload4 := []byte(`{"contact_name": "user1", "contact_email": "user1@testing.com", "phone_number": "+91 8978473874", "user_id": ""}`)
+	payload1 := []byte(`{"contact_name": "", "contact_email": "user1@testing.com", "phone_number": "+91 8978473874"}`)
+	payload2 := []byte(`{"contact_name": "user1", "contact_email": "", "phone_number": "+91 8978473874"}`)
+	payload3 := []byte(`{"contact_name": "user1", "contact_email": "user1@testing.com", "phone_number": ""}`)
 	
 	EmptyName := "Contact name is required."
 	EmptyEmail := "Contact email is required."
 	EmptyPhone := "Phone number is required."
-	EmptyUser := "Username is required."
 
 	tests := map[string]struct{
         payload  []byte
@@ -814,7 +798,6 @@ func TestUpdateContactEmptyFieldCheck(t *testing.T) {
 		"EmptyContactName": { payload: payload1, expected: EmptyName },
 		"EmptyContactEmail": { payload: payload2, expected: EmptyEmail },
 		"EmptyContactPhone": { payload: payload3, expected: EmptyPhone },
-		"EmptyContactUser": { payload: payload4, expected: EmptyUser },
     }
 
 	for name, test := range tests {

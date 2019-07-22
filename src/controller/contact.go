@@ -138,6 +138,10 @@ func (a *App) CreateContact(w http.ResponseWriter, r *http.Request) {
 	contact := &model.Contact{}
 	json.NewDecoder(r.Body).Decode(contact)
 
+	userid = r.Context().Value("user")
+	user := model.GetUser(userid, a.Conn)
+	contact.UserId = user.Username
+
 	if resp, ok := contact.Validate(a.Conn); !ok {
 		log.Println("Create Contact: Validation Failed")
 		Respond(w, resp)
@@ -151,6 +155,10 @@ func (a *App) DeleteContact(w http.ResponseWriter, r *http.Request) {
 
 	contact := &model.Contact{}
 	json.NewDecoder(r.Body).Decode(contact)
+
+	userid = r.Context().Value("user")
+	user := model.GetUser(userid, a.Conn)
+	contact.UserId = user.Username
 
 	if resp, ok := contact.Validate(a.Conn); !ok {
 		log.Println("Delete Contact: Validation Failed")
@@ -166,6 +174,10 @@ func (a *App) UpdateContact(w http.ResponseWriter, r *http.Request) {
 	contact := &model.Contact{}
 	json.NewDecoder(r.Body).Decode(contact)
 
+	userid = r.Context().Value("user")
+	user := model.GetUser(userid, a.Conn)
+	contact.UserId = user.Username
+	
 	if resp, ok := contact.Validate(a.Conn); !ok {
 		log.Println("Update Contact: Validation Failed")
 		Respond(w, resp)
