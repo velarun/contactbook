@@ -55,10 +55,10 @@ func ensureTableExists() {
 }
 
 func clearTable() {
-	a.Conn.Exec("DELETE FROM users")
+	a.Conn.Exec("TRUNCATE TABLE users")
 	a.Conn.Exec("ALTER TABLE users AUTO_INCREMENT = 1")
 
-	a.Conn.Exec("DELETE FROM contacts")
+	a.Conn.Exec("TRUNCATE TABLE contacts")
 	a.Conn.Exec("ALTER TABLE contacts AUTO_INCREMENT = 1")
 }
 
